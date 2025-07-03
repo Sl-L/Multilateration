@@ -1,9 +1,19 @@
 """Loads dataset of beacon positions, waits for data and calculates position"""
-
+import time
 import numpy as np
 from scipy.optimize import least_squares
 
 import pandas as pd
+
+class ts:
+    HEADER = '\033[48;2;0;68;102m\033[38;2;255;255;255m'
+    OK = '\033[38;2;0;114;178m'
+    WARNING = '\033[38;2;230;159;0m'
+    FAIL = '\033[38;2;213;94;0m'
+    OBSERVATION = '\033[38;2;153;153;153m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    ENDC = '\033[0m'
 
 class beaconManager:
     def __init__(self, beacons_pos_array: np.ndarray, beacon_ids: pd.Series):
@@ -53,6 +63,18 @@ def load_beacon_dataset(dataset: str) -> beaconManager:
     
     return beaconManager(beacons[['pos_x', 'pos_y']].to_numpy(), beacons['beacon_id'])
 
+def dt(base_time):
+    return f'\t({(1000*(time.time() - base_time)):.2f} ms)'
 
 if __name__ == '__main__':
-    bM = load_beacon_dataset("beacon-config-dataset-1.csv")
+    base_time = time.time()
+
+    print(time.strftime("%H:%M:%S %d/%m/%Y"))
+    print(f"{ts.HEADER}Loading config dataset 1{ts.ENDC}")
+
+    try:
+        bM = load_beacon_dataset("beacon-config-dataset-1.csv")
+    except:
+        print(f'{ts.FAIL}Error loading beacon config 1{dt(base_time)}{ts.ENDC}')
+    
+    print(f"{ts.OK}Beacon config 1 loaded{dt(base_time)}{ts.ENDC}")
