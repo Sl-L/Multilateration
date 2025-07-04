@@ -1,4 +1,5 @@
 """
+Server for local tests
 Loads dataset of beacon positions, waits for data and calculates position
 """
 
@@ -116,8 +117,8 @@ async def main():
         beacon_manager = beaconManager("beacon-config-dataset-1.csv")
 
     except FileNotFoundError:
-        print(f'{ts.FAIL}Error loading beacon config 1 - File not found{dt(base_time)}{ts.ENDC}')
-        exit()
+        print(f'\n{ts.FAIL}Error loading beacon config 1 - File not found{dt(base_time)}{ts.ENDC}')
+        raise
 
     print(f"{ts.OK}Beacon config 1 loaded{dt(base_time)}{ts.ENDC}")
 
