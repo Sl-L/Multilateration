@@ -18,34 +18,23 @@ import asyncio
 # Using websocket for testing because is easier, actual comms should use something else
 from websockets.asyncio.server import serve
 
-# ANSI color escape sequences for color printing
-class ts:
-    HEADER = '\033[48;2;0;68;102m\033[38;2;255;255;255m'
-    OK = '\033[38;2;0;114;178m'
-    WARNING = '\033[38;2;230;159;0m'
-    FAIL = '\033[38;2;213;94;0m'
-    OBSERVATION = '\033[38;2;153;153;153m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    ENDC = '\033[0m'
-
 class beaconManagerWS(s.beaconManager):
     async def beacon_data_receiver(self, websocket):
         """
         Expected messsage format: beacon_id@beacon_distance
         """
         async for message in websocket:
-            print(f"\n{ts.OBSERVATION}Message received: {message}{ts.ENDC}")
+            print(f"\n{s.ts.OBSERVATION}Message received: {message}{s.ts.ENDC}")
             message = message.split("@")
 
             try:
                 float(message[1])
 
             except ValueError:
-                print(f"{ts.WARNING}Invalid message format - distance provided is NOT a float{ts.ENDC}\n")
+                print(f"{s.ts.WARNING}Invalid message format - distance provided is NOT a float{s.ts.ENDC}\n")
 
             except IndexError:
-                print(f"{ts.WARNING}Invalid message format{ts.ENDC}\n")
+                print(f"{s.ts.WARNING}Invalid message format{s.ts.ENDC}\n")
 
             else:
                 self.update_beacon_distance(message[0], int(message[1]))
@@ -54,23 +43,23 @@ async def main():
     base_time = time.time()
 
     print(time.strftime("%H:%M:%S %d/%m/%Y"))
-    print(f"{ts.HEADER}Loading config dataset 1{ts.ENDC}")
+    print(f"{s.ts.HEADER}Loading config dataset 1{s.ts.ENDC}")
 
     try:
         beacon_manager = beaconManagerWS("./datasets/beacon-config-dataset-1.csv")
 
     except FileNotFoundError:
-        print(f'\n{ts.FAIL}Error loading beacon config 1 - File not found{s.dt(base_time)}{ts.ENDC}')
+        print(f'\n{s.ts.FAIL}Error loading beacon config 1 - File not found{s.dt(base_time)}{s.ts.ENDC}')
         raise
 
-    print(f"{ts.OK}Beacon config 1 loaded{s.dt(base_time)}{ts.ENDC}")
+    print(f"{s.ts.OK}Beacon config 1 loaded{s.dt(base_time)}{s.ts.ENDC}")
 
     base_time = time.time()
 
     ws_server = await serve(beacon_manager.beacon_data_receiver, "localhost", 8765)
     server_task = asyncio.create_task(ws_server.wait_closed())
 
-    print(f"{ts.OK}Server online, waiting for packets...{s.dt(base_time)}{ts.ENDC}")
+    print(f"{s.ts.OK}Server online, waiting for packets...{s.dt(base_time)}{s.ts.ENDC}")
 
     while True:
         await asyncio.sleep(5)
@@ -83,4 +72,4 @@ if __name__ == '__main__':
     try:
         asyncio.run(main())
     except:
-        print(f"\n{ts.WARNING}Program interrupted - Runtime: {s.runtime(start_time)}{ts.ENDC}\n")
+        print(f"\n{s.ts.WARNING}Program interrupted - Runtime: {s.runtime(start_time)}{s.ts.ENDC}\n")
