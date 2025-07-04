@@ -1,10 +1,11 @@
 Must:
-- Create client to send data to server
+- Create client to send data to server (might not be needed, maybe should just use test-client)
 - Create test data
 - Implement proper unit testing
-- Implement proper error system
-- Make the system not way for all beacons to have reported
+- Make the system not wait for all beacons to have reported
 - Add configurable threshold for ignoring "too old" beacon data
+- Add particle filter
+- Add some closing system for graceful termination
 
 Should:
 - Normalize typesetting
