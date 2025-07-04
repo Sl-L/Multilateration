@@ -2,6 +2,7 @@
 Server for local tests
 Loads dataset of beacon positions, waits for data and calculates position
 """
+import logging
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -24,17 +25,17 @@ class beaconManagerWS(s.beaconManager):
         Expected messsage format: beacon_id@beacon_distance
         """
         async for message in websocket:
-            print(f"\n{s.ts.OBSERVATION}Message received: {message}{s.ts.ENDC}")
+            log.debug(f"Message received: {message}")
             message = message.split("@")
 
             try:
                 float(message[1])
 
             except ValueError:
-                print(f"{s.ts.WARNING}Invalid message format - distance provided is NOT a float{s.ts.ENDC}\n")
+                log.warning("Invalid message format - distance provided is NOT a float")
 
             except IndexError:
-                print(f"{s.ts.WARNING}Invalid message format{s.ts.ENDC}\n")
+                log.warning("Invalid message format")
 
             else:
                 self.update_beacon_distance(message[0], int(message[1]))
@@ -42,24 +43,23 @@ class beaconManagerWS(s.beaconManager):
 async def main():
     base_time = time.time()
 
-    print(time.strftime("%H:%M:%S %d/%m/%Y"))
-    print(f"{s.ts.HEADER}Loading config dataset 1{s.ts.ENDC}")
+    log.debug("Loading config dataset 1")
 
     try:
         beacon_manager = beaconManagerWS("./datasets/beacon-config-dataset-1.csv")
 
     except FileNotFoundError:
-        print(f'\n{s.ts.FAIL}Error loading beacon config 1 - File not found{s.dt(base_time)}{s.ts.ENDC}')
+        log.critical(f'Error loading beacon config 1 - File not found{s.dt(base_time)}')
         raise
 
-    print(f"{s.ts.OK}Beacon config 1 loaded{s.dt(base_time)}{s.ts.ENDC}")
+    log.info(f"{s.ts.OK}Beacon config 1 loaded{s.dt(base_time)}{s.ts.ENDC}")
 
     base_time = time.time()
 
     ws_server = await serve(beacon_manager.beacon_data_receiver, "localhost", 8765)
     server_task = asyncio.create_task(ws_server.wait_closed())
 
-    print(f"{s.ts.OK}Server online, waiting for packets...{s.dt(base_time)}{s.ts.ENDC}")
+    log.info(f"{s.ts.OK}Server online, waiting for packets...{s.dt(base_time)}{s.ts.ENDC}")
 
     while True:
         await asyncio.sleep(5)
@@ -68,8 +68,25 @@ async def main():
 if __name__ == '__main__':
     start_time = time.time()
 
+    start_datetime = time.strftime("%Y-%m-%d %H %M %S")
+
+    file_handler = logging.FileHandler("./logs/test-server {start_datetime}.log", encoding="utf-8")
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(logging.Formatter(s.log_format))
+
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(logging.DEBUG)
+    console_handler.setFormatter(s.ColoredFormatter(s.log_format))
+
+    log = logging.getLogger("Logger")
+    log.setLevel(logging.DEBUG)
+    log.addHandler(file_handler)
+    log.addHandler(console_handler)
+
+    log.debug(f"Start datetime: {start_datetime}")
+
     #TODO: Graceful termination
     try:
         asyncio.run(main())
     except:
-        print(f"\n{s.ts.WARNING}Program interrupted - Runtime: {s.runtime(start_time)}{s.ts.ENDC}\n")
+        log.critical(f"Program interrupted - Runtime: {s.runtime(start_time)}")
