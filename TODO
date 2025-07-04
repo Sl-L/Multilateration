@@ -1,5 +1,4 @@
 Must:
-- Move from test-server to server, modifify test-server to call server as a module for testing
 - Create client to send data to server
 - Create test data
 - Implement proper unit testing
