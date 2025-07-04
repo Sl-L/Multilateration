@@ -1,0 +1,10 @@
+Must:
+- Create client to send data to server
+- Create test data
+- Implement proper unit testing
+- Implement proper error system
+- Make the system not way for all beacons to have reported
+- Add configurable threshold for ignoring "too old" beacon data
+
+Should:
+- Normalize typesetting

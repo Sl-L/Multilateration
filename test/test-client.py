@@ -24,5 +24,4 @@ async def hello():
 
 
 if __name__ == "__main__":
-    distance_dataset = csv.
     asyncio.run(hello())
