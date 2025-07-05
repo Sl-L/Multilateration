@@ -51,17 +51,18 @@ class beaconManager:
         beacons = pd.read_csv(dataset)
         self.beacons_pos_array = beacons[['pos_x', 'pos_y']].to_numpy()
         self.beacons_dict = dict.fromkeys(beacons['beacon_id'], None)
+        self.log = logging.getLogger("Logger")
 
     def update_beacon_distance(self, id, distance) -> None:
-        log.debug("Updating beacon distance")
-        log.debug(f"ID: {id}\tDistance: {distance} m")
+        self.log.debug("Updating beacon distance")
+        self.log.debug(f"ID: {id}\tDistance: {distance} m")
         if id in self.beacons_dict:
             self.beacons_dict[id] = distance
         
         else:
-            log.warning("New beacon id fed on update, discarting...")
+            self.log.warning(f"Beacon id ( {id} ), not on list {str(self.beacons_dict.keys())} - Ignoring")
 
-    def residuals(p, beacons, distances) -> np.ndarray:
+    def residuals(self, p, beacons, distances) -> np.ndarray:
         x, y = p
         return np.sqrt((x - beacons[:, 0])**2 + (y - beacons[:, 1])**2) - distances
     
@@ -78,7 +79,7 @@ class beaconManager:
         b = (y2 - y1)
         a = (x2 - x1)
 
-        t = (r1^2 - r3^2 + y3^2 + x3^2 - y1^2 - x1^2 ) / 2
+        t = (r1**2 - r3**2 + y3**2 + x3**2 - y1**2 - x1**2 ) / 2
         s = (y3 - y1)
         r = (x3 - x1)
 
@@ -100,9 +101,10 @@ class beaconManager:
         A return should be added instead of a console output
         """
         if not None in self.beacons_dict.values():
-            log.info(self.lm_optimize())
+            result = self.lm_optimize()
+            self.log.info(f"Position calculated: {result[0]:.4f}, {result[1]:.4f}")
         else:
-            log.error(f"There are beacons that haven't reported distance yet")
+            self.log.error(f"There are beacons that haven't reported distance yet")
 
 async def main():
     base_time = time.time()
@@ -138,7 +140,7 @@ if __name__ == '__main__':
     start_datetime = time.strftime("%Y-%m-%d %H %M %S")
 
     console_handler = logging.StreamHandler(sys.stdout)
-    log = logging.getLogger("MyLogger")
+    log = logging.getLogger("Logger")
 
     if args.debug:
         console_handler.setLevel(logging.DEBUG)

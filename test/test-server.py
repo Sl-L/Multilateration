@@ -38,7 +38,7 @@ class beaconManagerWS(s.beaconManager):
                 log.warning("Invalid message format")
 
             else:
-                self.update_beacon_distance(message[0], int(message[1]))
+                self.update_beacon_distance(int(message[0]), float(message[1]))
 
 async def main():
     base_time = time.time()
@@ -52,14 +52,14 @@ async def main():
         log.critical(f'Error loading beacon config 1 - File not found{s.dt(base_time)}')
         raise
 
-    log.info(f"{s.ts.OK}Beacon config 1 loaded{s.dt(base_time)}{s.ts.ENDC}")
+    log.info(f"Beacon config 1 loaded{s.dt(base_time)}")
 
     base_time = time.time()
 
     ws_server = await serve(beacon_manager.beacon_data_receiver, "localhost", 8765)
     server_task = asyncio.create_task(ws_server.wait_closed())
 
-    log.info(f"{s.ts.OK}Server online, waiting for packets...{s.dt(base_time)}{s.ts.ENDC}")
+    log.info(f"Server online, waiting for packets...{s.dt(base_time)}")
 
     while True:
         await asyncio.sleep(5)
@@ -70,16 +70,14 @@ if __name__ == '__main__':
 
     start_datetime = time.strftime("%Y-%m-%d %H %M %S")
 
-    file_handler = logging.FileHandler("./logs/test-server {start_datetime}.log", encoding="utf-8")
-    file_handler.setLevel(logging.DEBUG)
+    file_handler = logging.FileHandler(f"./logs/test-server {start_datetime}.log", encoding="utf-8")
     file_handler.setFormatter(logging.Formatter(s.log_format))
 
     console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.DEBUG)
     console_handler.setFormatter(s.ColoredFormatter(s.log_format))
 
     log = logging.getLogger("Logger")
-    log.setLevel(logging.DEBUG)
+    log.setLevel(logging.INFO)
     log.addHandler(file_handler)
     log.addHandler(console_handler)
 
@@ -90,3 +88,4 @@ if __name__ == '__main__':
         asyncio.run(main())
     except:
         log.critical(f"Program interrupted - Runtime: {s.runtime(start_time)}")
+        raise
