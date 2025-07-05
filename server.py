@@ -55,12 +55,11 @@ class beaconManager:
 
     def update_beacon_distance(self, id, distance) -> None:
         self.log.debug("Updating beacon distance")
-        self.log.debug(f"ID: {id}\tDistance: {distance} m")
         if id in self.beacons_dict:
             self.beacons_dict[id] = distance
         
         else:
-            self.log.warning(f"Beacon id ( {id} ), not on list {str(self.beacons_dict.keys())} - Ignoring")
+            self.log.warning(f"Beacon ( id: {id} type: {type(id)} ) not on list {str(self.beacons_dict.keys())} - Ignoring data")
 
     def residuals(self, p, beacons, distances) -> np.ndarray:
         x, y = p

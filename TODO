@@ -1,6 +1,7 @@
 Must:
-- Create client to send data to server (might not be needed, maybe should just use test-client)
 - Create test data
+- Command-line dataset selector for test-server and test-client
+- Add logging to test-client
 - Implement proper unit testing
 - Make the system not wait for all beacons to have reported
 - Add configurable threshold for ignoring "too old" beacon data

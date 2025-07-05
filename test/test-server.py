@@ -77,7 +77,7 @@ if __name__ == '__main__':
     console_handler.setFormatter(s.ColoredFormatter(s.log_format))
 
     log = logging.getLogger("Logger")
-    log.setLevel(logging.INFO)
+    log.setLevel(logging.DEBUG)
     log.addHandler(file_handler)
     log.addHandler(console_handler)
 
